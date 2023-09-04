@@ -40,6 +40,7 @@ func main() {
 	if !strings.HasPrefix(organizationUrl, "https://") {
 		log.Fatal("You must provide a valid organization URL")
 	}
+	organizationUrl = strings.TrimSuffix(organizationUrl, "/")
 	if len(poolName) == 0 {
 		log.Fatal("You must provide a -pool-name")
 	}
