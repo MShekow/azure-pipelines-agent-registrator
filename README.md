@@ -18,7 +18,7 @@ Example for Linux/UNIX:
   -organization-url https://dev.azure.com/foobar \
   -pool-name your-azure-devops-pool-name \
   -pat <Azure DevOps Personal Access Token with 'Agent Pools Read&Manage' permission> \
-  -agent-name-prefix dummy-agent
+  -agent-name-prefix dummy-agent \
   -extra-agent-contaners 'ubuntu,registry.hub.docker.com/library/ubuntu:22.04,250m,64Mi'
 ```
 
