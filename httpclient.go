@@ -64,7 +64,7 @@ func getPoolIdFromName(pat, organizationUrl, poolName string, httpClient *http.C
 	return poolId, nil
 }
 
-func registerFakeAgent(pat, organizationUrl, agentNamePrefix, extraAgentContainers string, poolId int64, httpClient *http.Client) (string, error) {
+func registerFakeAgent(pat, organizationUrl, agentNamePrefix string, capabilities *map[string]string, poolId int64, httpClient *http.Client) (string, error) {
 	url := fmt.Sprintf("%s/_apis/distributedtask/pools/%d/agents?api-version=7.0", organizationUrl, poolId)
 
 	for {
@@ -77,10 +77,12 @@ func registerFakeAgent(pat, organizationUrl, agentNamePrefix, extraAgentContaine
 			"enabled": true,
 			"status": "offline",
 			"provisioningState": "Provisioned",
-			"systemCapabilities": {"ExtraAgentContainers": "%s"}
+			"systemCapabilities": %s
 		}`
 
-		requestBody := fmt.Sprintf(requestBodyTemplate, fakeAgentName, extraAgentContainers)
+		capabilitiesJsonStr, _ := json.Marshal(*capabilities)
+
+		requestBody := fmt.Sprintf(requestBodyTemplate, fakeAgentName, capabilitiesJsonStr)
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(requestBody)))
 		if err != nil {

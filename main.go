@@ -16,7 +16,7 @@ var organizationUrl string
 var poolName string
 var pat string
 var agentNamePrefix string
-var extraAgentContainers string
+var capabilities string
 
 // TODO consider implementing auto-retry logic?
 
@@ -25,7 +25,7 @@ func init() {
 	flag.StringVar(&poolName, "pool-name", "", "name of your Azure DevOps pool")
 	flag.StringVar(&pat, "pat", "", "Azure DevOps Personal Access Token with 'Agent Pools Read&Manage' permission")
 	flag.StringVar(&agentNamePrefix, "agent-name-prefix", "", "prefix for the name of the agent, the tool appends a short random string")
-	flag.StringVar(&extraAgentContainers, "extra-agent-containers", "", "Max directory depth (level) of the listing to be printed")
+	flag.StringVar(&capabilities, "capabilities", "", "one or more key-value pairs (notation: key=value), separated by semicolon")
 }
 
 func main() {
@@ -50,6 +50,11 @@ func main() {
 	if len(agentNamePrefix) == 0 {
 		log.Fatal("You must provide an -agent-name-prefix")
 	}
+	if len(capabilities) == 0 {
+		log.Fatal("You must provide capabilities")
+	}
+
+	capabilitiesMap := GetCapabilitiesMapFromString(capabilities)
 
 	timeout := 2 * time.Second
 	httpClient := &http.Client{
@@ -62,7 +67,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fakeAgentName, err := registerFakeAgent(pat, organizationUrl, agentNamePrefix, extraAgentContainers, poolId, httpClient)
+	fakeAgentName, err := registerFakeAgent(pat, organizationUrl, agentNamePrefix, capabilitiesMap, poolId, httpClient)
 	if err != nil {
 		fmt.Printf("Unable to create fake agent: %v\n", err)
 		os.Exit(1)

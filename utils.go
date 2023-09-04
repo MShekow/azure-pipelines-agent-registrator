@@ -1,6 +1,9 @@
 package main
 
-import "crypto/rand"
+import (
+	"crypto/rand"
+	"strings"
+)
 
 var chars = "abcdefghijklmnopqrstuvwxyz1234567890"
 
@@ -12,4 +15,18 @@ func randomString(length int) string {
 		b[i] = chars[int(b[i])%charsLength]
 	}
 	return string(b)
+}
+
+func GetCapabilitiesMapFromString(capabilities string) *map[string]string {
+	m := map[string]string{}
+
+	capabilitiesList := strings.Split(capabilities, ";")
+	for _, capabilityStr := range capabilitiesList {
+		capabilityTuple := strings.Split(capabilityStr, "=")
+		if len(capabilityTuple) == 2 {
+			m[capabilityTuple[0]] = capabilityTuple[1]
+		}
+	}
+
+	return &m
 }
