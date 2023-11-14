@@ -11,6 +11,7 @@ import (
 )
 
 const version = "1.0"
+const httpRequestTimeout = 10 * time.Second
 
 var organizationUrl string
 var poolName string
@@ -56,9 +57,8 @@ func main() {
 
 	capabilitiesMap := GetCapabilitiesMapFromString(capabilities)
 
-	timeout := 2 * time.Second
 	httpClient := &http.Client{
-		Timeout: timeout,
+		Timeout: httpRequestTimeout,
 	}
 
 	poolId, err := getPoolIdFromName(pat, organizationUrl, poolName, httpClient)

@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
+
+const maxRetries = 2
+const delayBetweenRetries = 5 * time.Second
 
 type AzurePipelinesApiPoolNameResponse struct {
 	// Because there could be multiple Azure Pipeline pools with the same name, the API returns an array. The objects
@@ -29,7 +33,7 @@ func getPoolIdFromName(pat, organizationUrl, poolName string, httpClient *http.C
 		return 0, err
 	}
 
-	response, err := httpClient.Do(req)
+	response, err := doRequestWithRetries(httpClient, req)
 	if err != nil {
 		return 0, err
 	}
@@ -96,7 +100,7 @@ func registerFakeAgent(pat, organizationUrl, agentNamePrefix string, capabilitie
 
 		req.Header.Set("Content-Type", "application/json")
 
-		response, err := httpClient.Do(req)
+		response, err := doRequestWithRetries(httpClient, req)
 		if err != nil {
 			return "", err
 		}
@@ -113,4 +117,23 @@ func registerFakeAgent(pat, organizationUrl, agentNamePrefix string, capabilitie
 
 		return fakeAgentName, nil
 	}
+}
+
+func doRequestWithRetries(httpClient *http.Client, request *http.Request) (*http.Response, error) {
+	retriesLeft := maxRetries
+	var lastError error
+	for retriesLeft >= 0 {
+		if retriesLeft != maxRetries {
+			fmt.Printf("Retrying request in a few seconds. Last error: %+v\n", lastError)
+			time.Sleep(delayBetweenRetries)
+		}
+		response, err := httpClient.Do(request)
+		if err == nil {
+			return response, nil
+		}
+		lastError = err
+		retriesLeft -= 1
+
+	}
+	return nil, lastError
 }
