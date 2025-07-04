@@ -1,5 +1,8 @@
 # Azure DevOps Pipelines Agent Registrator
 
+> [!CAUTION]
+> I no longer actively maintain this project!
+
 This is a simple CLI helper tool that registers fake/offline Azure Pipelines Agents against the Azure Pipelines API
 (see https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/agents/add?view=azure-devops-rest-7.0).
 It sets the agent's _system_ capability to any capabilities you define as CLI argument.
